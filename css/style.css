@@ -1,0 +1,156 @@
+.body-container {
+  margin: auto;
+  height: 100vh;
+  max-width: 900px;
+  background-color: rgb(75, 75, 139);
+  /* background-color: rgb(157, 216, 216); */
+  color: #eee;
+  font-family: poppins;
+}
+p {
+  margin: 0;
+}
+
+.container table {
+  margin: auto;
+  margin-top: 10px;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-between;
+}
+
+.smiley {
+  display: inline;
+  margin-left: 20px;
+}
+
+.stats p {
+  padding-bottom: 0;
+}
+
+.cell {
+  background-color: lightgray;
+  color: rgb(78, 78, 78);
+  text-align: center;
+  transition: all 0.5s ease;
+}
+
+.modal {
+  display: none;
+  opacity: 0;
+  position: absolute;
+  top: 30%;
+  right: 46.2%;
+  background-color: rgb(104, 104, 104);
+  width: 200px;
+  height: 100px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 0 0 4px grey;
+  padding-top: 10px;
+  transition: all 0.5s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.inline-list {
+  display: flex;
+}
+
+.mid-board {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.best-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+}
+
+.best-score h2 {
+  margin-bottom: 0px;
+  white-space: nowrap;
+}
+
+.best-score ul {
+  text-align: center;
+  font-size: 20px;
+}
+
+.best-score li {
+  margin: 5px;
+}
+
+.manual-toggle {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  width: 60px;
+  height: 30px;
+  background-color: lightgrey;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+
+.manual-container {
+  margin-top: 20px;
+}
+
+.manual-btn {
+  width: 25px;
+  height: 25px;
+  margin: 0 5px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.active {
+  justify-content: end;
+  background-color: dodgerblue;
+}
+
+.btn {
+  background-color: dodgerblue;
+  border: none;
+  border: 2px solid lightgrey;
+  padding: 10px;
+  border-radius: 50px;
+}
+
+.timer {
+  background-color: rgb(173, 86, 255);
+  color: rgb(43, 38, 38);
+  width: 200px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 20px orange;
+  margin: 20px auto;
+  font-size: 40px;
+  font-weight: 600;
+}
+
+.safe-clicks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.mid-col {
+  text-align: center;
+}

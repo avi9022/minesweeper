@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Minesweeper</title>
+  </head>
+  <body onload="init()" class="body-container">
+    <div class="mid-board">
+      <div class="left-col">
+        <div class="stats">
+          <div class="lives-container">
+            <p>Lives:</p>
+            <div class="lives"></div>
+          </div>
+          <div class="hint-container">
+            <p>Hints:</p>
+            <div class="hints"></div>
+          </div>
+        </div>
+        <div class="safe-clicks">
+          <button class="btn safe-click" onclick="showSafeCell()">
+            Safe Click
+          </button>
+          <p><span class="safe-clicks-remain">3</span> clicks remaining!</p>
+        </div>
+        <button class="btn" onclick="undo()">Undo</button>
+        <button class="btn" onclick="sevenBoom()">7 BOOM!</button>
+        <div class="manual-container">
+          <p>Add bombs manually:</p>
+          <div class="manual-toggle" onclick="turnOnManual()">
+            <div class="manual-btn"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mid-col">
+        <div class="difficulties">
+          <button class="btn" onclick="changeDifficulty(4,2)">Easy(16)</button>
+          <button class="btn" onclick="changeDifficulty(8, 12)">
+            Medium(64)
+          </button>
+          <button class="btn" onclick="changeDifficulty(12, 30)">
+            Extreme(144)
+          </button>
+          <div class="smiley" onclick="restartGame()">😀</div>
+        </div>
+
+        <div class="container"></div>
+        <div class="timer">
+          <p>Timer:</p>
+          <p><span class="mins">00</span>:<span class="secs">00</span></p>
+        </div>
+      </div>
+      <div class="best-score">
+        <h2>The best of the bests:</h2>
+        <ul>
+          <li>
+            Easy:
+            <span class="easy"
+              ><span class="mins">00</span>:<span class="secs">00</span></span
+            >
+          </li>
+          <li>
+            Medium:
+            <span class="medium"
+              ><span class="mins">00</span>:<span class="secs">00</span></span
+            >
+          </li>
+          <li>
+            Extreme:
+            <span class="extreme"
+              ><span class="mins">00</span>:<span class="secs">00</span></span
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="modal">
+      <p class="msg"></p>
+      <button class="btn" onclick="restartGame()">Restart</button>
+    </div>
+    <script src="/js/utils.js"></script>
+    <script src="/js/game.js"></script>
+  </body>
+</html>
