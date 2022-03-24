@@ -19,16 +19,22 @@ function createMat(ROWS, COLS) {
 }
 
 function printMat(mat, selector, cellSize) {
-  var strHTML = '<table border="0"><tbody>'
+  var strHTML = '<table border="0" style="width:450px; heigth:450px"><tbody>'
   for (var i = 0; i < mat.length; i++) {
     strHTML += '<tr>'
     for (var j = 0; j < mat[0].length; j++) {
       var cell = ''
-      if (mat[i][j].isShown) cell = mat[i][j].minesAroundCount
+      var bgColor = 'rgb(78, 78, 78)'
+      var color = 'lightgray'
+      if (mat[i][j].isShown) {
+        cell = mat[i][j].minesAroundCount
+        bgColor = 'rgb(150, 150, 150)'
+        color = 'rgb(78, 78, 78)'
+      }
       if (mat[i][j].isMine && mat[i][j].isShown) cell = MINE
       if (mat[i][j].isMarked) cell = FLAG
       var className = 'cell cell-' + i + '-' + j
-      strHTML += `<td style="width:${cellSize}px; height:${cellSize}px; font-size:${
+      strHTML += `<td style="background-color:${bgColor}; color:${color};width:${cellSize}px; height:${cellSize}px; font-size:${
         cellSize * 0.3
       }px" onclick="cellClicked(this, ${i}, ${j})" oncontextmenu="cellMarked(event, this, ${i}, ${j})" class="${className}"> ${cell} </td>`
     }

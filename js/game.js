@@ -50,11 +50,11 @@ function init() {
   renderLives()
   renderHints()
   renderBestScores()
+  renderSafeClickCount()
   gGame.minesNotRevealed = gLevel.MINES
 
   if (gGame.isSevenBoom) {
     addMines()
-    gGame.isFirstMove = false
     gGame.isOn = true
   }
 }
@@ -66,77 +66,7 @@ function changeDifficulty(SIZE, MINES) {
     minesAdded: [],
   }
 
-  clearInterval(gGameTimerIdx)
   restartGame()
-}
-
-function cellClicked(elCell, row, col) {
-  //Manual insertion of mines
-  if (
-    gGame.isManualOn &&
-    !gGame.isOn &&
-    gLevel.minesAdded.length !== gLevel.MINES
-  ) {
-    addMineManualy(elCell, row, col)
-    return
-  }
-
-  if (gGame.isFirstMove) {
-    startGame(row, col)
-  }
-
-  var cell = gBoard[row][col]
-  if (cell.isMarked || cell.isShown || !gGame.isOn) return
-
-  if (gGame.isHintOn) {
-    showHint(elCell, row, col)
-    gGame.isHintOn = false
-    gGame.hintsCount--
-    renderHints()
-    return
-  }
-
-  // Adding the state of the board to the memory array before it changes
-  gPrevMoves.push(cloneBoard())
-
-  if (cell.isMine) {
-    renderCell({ i: row, j: col }, MINE)
-    gGame.liveCount--
-    gGame.minesNotRevealed--
-    cell.isShown = true
-    if (!gGame.liveCount) gameOver(true)
-    renderLives()
-    return
-  }
-
-  // Render cell's minesAroundCount and update model
-  elCell.innerText = cell.minesAroundCount
-  cell.isShown = true
-  gGame.shownCount++
-
-  // Open all cells next to current cell the have no neighbors
-  if (cell.minesAroundCount === 0) expandShown(gBoard, row, col)
-
-  checkWin()
-}
-
-function expandShown(board, row, col) {
-  var neighbors = getNeighbors(board, row, col)
-  for (var i = 0; i < neighbors.length; i++) {
-    var currNeighbor = neighbors[i]
-    if (
-      currNeighbor.cell.isMine ||
-      currNeighbor.cell.isShown ||
-      currNeighbor.cell.isMarked
-    )
-      continue
-    currNeighbor.cell.isShown = true
-    gGame.shownCount++
-    renderCell(currNeighbor.location, currNeighbor.cell.minesAroundCount)
-    if (currNeighbor.cell.minesAroundCount === 0) {
-      expandShown(board, currNeighbor.location.i, currNeighbor.location.j)
-    }
-  }
 }
 
 function startGame(clickedRow, clickedCol) {
@@ -144,58 +74,6 @@ function startGame(clickedRow, clickedCol) {
   gGame.isFirstMove = false
   addMines(clickedRow, clickedCol)
   startTimer()
-}
-
-function addMines(clickedRow, clickedCol) {
-  if (gGame.isManualOn) {
-    return
-  }
-  if (gGame.isSevenBoom) {
-    for (var i = 1; i < gLevel.SIZE ** 2 - 1; i++) {
-      if (i % 7 === 0 || (i + '').includes('7')) {
-        var row = Math.floor(i / gLevel.SIZE)
-        var col = i - row * gLevel.SIZE - 1
-        if (i % gLevel.SIZE === 0) {
-          row--
-          col = gLevel.SIZE - 1
-        }
-        gBoard[row][col].isMine = true
-        setMinesNegsCount({ i: row, j: col })
-      }
-    }
-    return
-  }
-
-  var emptyCells = getEmptyCellsExcept(gBoard, clickedRow, clickedCol)
-  for (var i = 0; i < gLevel.MINES; i++) {
-    var randEmptyCellIdx = getRandomFromArray(emptyCells)
-    var location = emptyCells[randEmptyCellIdx]
-    gBoard[location.i][location.j].isMine = true
-    setMinesNegsCount(location)
-    emptyCells.splice(randEmptyCellIdx, 1)
-  }
-}
-
-function setMinesNegsCount(mineCellLocation) {
-  var neighbors = getNeighbors(gBoard, mineCellLocation.i, mineCellLocation.j)
-  for (var i = 0; i < neighbors.length; i++) {
-    neighbors[i].cell.minesAroundCount++
-  }
-}
-
-function addMineManualy(elCell, row, col) {
-  gBoard[row][col].isMine = true
-  elCell.innerText = MINE
-  gLevel.minesAdded.push(elCell)
-  setMinesNegsCount({ i: row, j: col })
-  if (gLevel.minesAdded.length === gLevel.MINES) {
-    setTimeout(function () {
-      for (var i = 0; i < gLevel.minesAdded.length; i++) {
-        var currMine = gLevel.minesAdded[i]
-        currMine.innerText = ''
-      }
-    }, 500)
-  }
 }
 
 function startTimer() {
@@ -210,20 +88,6 @@ function startTimer() {
     gElSecsLable.innerText = secsStr
     gElMinsLable.innerText = minsStr
   }, 1000)
-}
-
-function cellMarked(ev, elCell, row, col) {
-  ev.preventDefault()
-  var cell = gBoard[row][col]
-  if (cell.isShown || (!gGame.isOn && (gGame.isFirstMove || gGame.isManualOn)))
-    return
-  var cellContent = cell.isMarked ? '' : FLAG
-  gGame.markedCount = cell.isMarked
-    ? gGame.markedCount - 1
-    : gGame.markedCount + 1
-  cell.isMarked = !cell.isMarked
-  elCell.innerText = cellContent
-  checkWin()
 }
 
 function checkWin() {
@@ -246,7 +110,7 @@ function gameOver(isLost) {
   if (!isLost) {
     setBestScore()
     renderBestScores()
-  }
+  } else showAllMines(gLevel.minesAdded)
 }
 
 function restartGame(sevenBoom = false) {
@@ -265,10 +129,12 @@ function restartGame(sevenBoom = false) {
   }
 
   gLevel.minesAdded = []
+  gPrevMoves = []
 
   init()
 
   //Reset and render timer
+  clearInterval(gGameTimerIdx)
   gMins = 0
   gSecs = 0
   gElSecsLable.innerText = '00'
@@ -304,6 +170,7 @@ function renderHints() {
 }
 
 function hint() {
+  if (!gGame.isOn) return
   gGame.isHintOn = true
 }
 
@@ -311,6 +178,7 @@ function showHint(ellClickedCell, row, col) {
   ellClickedCell.innerText = gBoard[row][col].minesAroundCount
   var neighbors = getNeighbors(gBoard, row, col)
   for (var i = 0; i < neighbors.length; i++) {
+    if (neighbors[i].cell.isShown) continue
     var currCellContent = neighbors[i].cell.isMine
       ? MINE
       : neighbors[i].cell.minesAroundCount
@@ -320,6 +188,7 @@ function showHint(ellClickedCell, row, col) {
   setTimeout(function () {
     ellClickedCell.innerText = ''
     for (var i = 0; i < neighbors.length; i++) {
+      if (neighbors[i].cell.isShown) continue
       renderCell(neighbors[i].location, '')
     }
   }, 1000)
@@ -375,28 +244,6 @@ function renderBestScores() {
   }
 }
 
-function showSafeCell() {
-  if (gGame.safeClicks === 0 || !gGame.isOn) return
-  console.log('in')
-  gGame.safeClicks--
-  var emptyCells = getEmptyCells(gBoard)
-  var randomCell = getRandomFromArray(emptyCells)
-  var location = emptyCells[randomCell]
-  var elCell = document.querySelector(`.cell-${location.i}-${location.j}`)
-
-  var alpha = '1'
-  var blinkingCellIntervalId = setInterval(function () {
-    alpha = alpha === '1' ? '0.7' : '1'
-    elCell.style.backgroundColor = `rgba(157, 216, 216,${alpha})`
-  }, 300)
-
-  setTimeout(function () {
-    clearInterval(blinkingCellIntervalId)
-    elCell.style.backgroundColor = 'lightgray'
-  }, 2000)
-  renderSafeClickCount()
-}
-
 function renderSafeClickCount() {
   var elSafeClickLable = document.querySelector('.safe-clicks-remain')
   elSafeClickLable.innerText = gGame.safeClicks
@@ -404,24 +251,34 @@ function renderSafeClickCount() {
 
 function undo() {
   if (!gPrevMoves.length || !gGame.isOn) return
-  gBoard = gPrevMoves.pop()
-  printMat(gBoard, '.container', 400 / gLevel.SIZE)
+
+  var lastGameState = gPrevMoves.pop()
+  gBoard = [...lastGameState.newBoard]
+  gGame = lastGameState.newGame
+  printMat(gBoard, '.container', 450 / gLevel.SIZE)
+  renderLives()
+  renderHints()
+  renderSafeClickCount()
 }
 
 function cloneBoard() {
-  var newBoard = []
+  var gameState = {
+    newBoard: [],
+    newGame: { ...gGame },
+  }
   for (var i = 0; i < gBoard.length; i++) {
     var newRow = []
     for (var j = 0; j < gBoard.length; j++) {
       var newCell = { ...gBoard[i][j] }
       newRow.push(newCell)
     }
-    newBoard.push(newRow)
+    gameState.newBoard.push(newRow)
   }
-  return newBoard
+  return gameState
 }
 
 function sevenBoom() {
+  if (gGame.isManualOn) return
   restartGame(true)
 }
 
